@@ -3,10 +3,20 @@ const Property = require ("../models/Property");
 const auth = require ("../middleware/auth");
 
 //Create Property
-router.post("/list-property/", auth , async (req, res) => {
+router.post("/listProperty", auth , async (req, res) => {
     try {
-        res.json(req.body);
+        const property = new Property({...req.body, userId: req.user.userId});
+        await property.save();
+        res.status(201).json(property);
     } catch (err) {
         res.status(500).json({error: err.message});
     }
 });
+
+// Get Properties
+router.get("/", auth, async (req, res) => {
+  const properties = await Property.find({ userId: req.user.userId });
+  res.json(properties);
+});
+
+module.exports = router;
